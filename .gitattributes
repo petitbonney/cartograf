@@ -1,0 +1,7 @@
+# Keep LF endings even when checked out on Windows (CRLF breaks the shell script and the shebang).
+* text=auto eol=lf
+# Windows batch files need CRLF.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.cer binary
+*.der binary
