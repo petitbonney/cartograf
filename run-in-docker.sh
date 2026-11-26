@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run cartography.py (or the tests) in a throwaway python container.
-# Passes GITLAB_TOKEN / GITLAB_URL through from the environment.
+# Passes GITLAB_TOKEN / GITLAB_URL through from the environment, and
+# PIP_INDEX_URL / PIP_TRUSTED_HOST when set (for a corporate PyPI mirror).
 #
 # Corporate CA: set CA_CERT to the path of the PEM certificate file, e.g.
 #   export CA_CERT=/usr/local/share/ca-certificates/corp.crt
@@ -14,7 +15,8 @@ cd "$(dirname "$0")"
 IMAGE="${CARTOGRAF_IMAGE:-python:3.13-slim}"
 
 args=(--rm -v "$PWD":/w -w /w -v cartograf-pip-cache:/root/.cache/pip
-      -e GITLAB_TOKEN -e GITLAB_URL -e PIP_ROOT_USER_ACTION=ignore -e PYTHONDONTWRITEBYTECODE=1)
+      -e GITLAB_TOKEN -e GITLAB_URL -e PIP_INDEX_URL -e PIP_TRUSTED_HOST
+      -e PIP_ROOT_USER_ACTION=ignore -e PYTHONDONTWRITEBYTECODE=1)
 setup=""
 if [ -n "${CA_CERT:-}" ]; then
   if [ ! -f "$CA_CERT" ]; then

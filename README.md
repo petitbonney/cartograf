@@ -26,6 +26,16 @@ Clone the project into the WSL filesystem (e.g. `~/cartograf`), not under `/mnt/
 export CA_CERT=/usr/local/share/ca-certificates/corp.crt
 ```
 
+**PyPI mirror.** If public PyPI is blocked, point pip at your internal index. The script passes both variables into the container when they are set:
+
+```bash
+export PIP_INDEX_URL=https://nexus.example.com/repository/pypi/simple
+```
+
+```bash
+export PIP_TRUSTED_HOST=nexus.example.com
+```
+
 **Token and URL.** `read -s` keeps the token out of shell history and off the screen:
 
 ```bash
@@ -36,7 +46,7 @@ read -rsp 'GitLab token: ' GITLAB_TOKEN; echo; export GITLAB_TOKEN
 export GITLAB_URL=https://gitlab.example.com
 ```
 
-Put the `CA_CERT` and `GITLAB_URL` lines in `~/.bashrc` to set them once.
+Put the `export` lines (except the token) in `~/.bashrc` to set them once.
 
 First a dry run, which lists what would be fetched and writes nothing:
 
