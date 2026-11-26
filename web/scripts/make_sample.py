@@ -42,6 +42,7 @@ class SampleGitLab(FakeGitLab):
     def __init__(self):
         super().__init__()
         self.broken: set[int] = set()  # project ids whose tree listing fails
+        self.broken_branches: set[int] = set()  # project ids whose branch listing fails
 
     def add_project(self, group, pid, path, branches, default="main", tags=None):
         super().add_project(group, pid, path, branches, default, tags)
@@ -51,6 +52,11 @@ class SampleGitLab(FakeGitLab):
         if pid in self.broken:
             raise GitLabError("500 Internal Server Error on repository/tree", 500)
         return super().tree(pid, ref)
+
+    def branches(self, pid):
+        if pid in self.broken_branches:
+            raise GitLabError("502 Bad Gateway on repository/branches", 502)
+        return super().branches(pid)
 
     def current_user(self):
         return {"username": "demo-reader"}
@@ -176,6 +182,10 @@ def seed(gl: SampleGitLab, first_run: bool) -> None:
         # new commit on the second run, whose fetch fails
         "main": ("m3d0001" if first_run else "m3d0002", ago(2), app("media-service", g="com.acme.web", parent=f"{ACME_PARENT}:3.5.0")),
     })
+    if not first_run:  # appears on the second run, and its fetch fails: nothing known yet
+        add("web", "web/analytics-proxy", {
+            "main": ("a9x0001", ago(1), app("analytics-proxy", g="com.acme.web", parent=f"{ACME_PARENT}:3.5.0")),
+        }, pid_=1998)
     add("web", "web/cms", {"main": ("c0m5001", ago(3), {"package.json": "{}"})})
     add("web", "web/landing", {"main": ("l4n0001", ago(70), {"index.html": "<html/>"})})
 
@@ -202,8 +212,12 @@ def seed(gl: SampleGitLab, first_run: bool) -> None:
     })
     add("data", "data/notebooks", {"main": ("n8b0001", ago(10), {"requirements.txt": "pandas"})})
 
-    if not first_run:  # second run: one fetch fails (it was fine on the first run, so it shows as an error)
-        gl.broken.update(g["id"] for g in gl.groups["web"] if g["path_with_namespace"] == "web/media-service")
+    if not first_run:
+        ids = {g["path_with_namespace"]: g["id"] for grp in gl.groups.values() for g in grp}
+        # fetch of a new commit fails: the facts of the first run's commit are kept
+        gl.broken.update({ids["web/media-service"], ids["web/analytics-proxy"]})
+        # branch listing fails: the first run's branches and facts are kept
+        gl.broken_branches.add(ids["data/warehouse-sync"])
 
 
 def run(first_run: bool) -> None:

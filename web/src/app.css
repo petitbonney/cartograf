@@ -21,12 +21,14 @@
   --series-2: #eb6834;
   --series-3: #1baf7a;
   --series-4: #eda100;
+  --series-5: #e87ba4;
   --series-gray: #b8b6ae;
 
   --kind-framework: var(--series-1);
   --kind-linked: var(--series-2);
   --kind-adhoc: var(--series-3);
   --kind-non-maven: var(--series-4);
+  --kind-unknown: var(--series-5);
   --kind-gone: var(--series-gray);
 
   --good: #0ca30c;
@@ -68,6 +70,7 @@
     --series-2: #d95926;
     --series-3: #199e70;
     --series-4: #c98500;
+    --series-5: #d55181;
     --series-gray: #5c5b57;
 
     --good-ink: #0ca30c;

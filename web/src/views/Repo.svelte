@@ -44,7 +44,12 @@
         facts are kept below.
       </p>
     {/if}
-    {#if repo.inventory_error}<p class="notice critical">Inventory error: {repo.inventory_error}</p>{/if}
+    {#if repo.inventory_error}
+      <p class="notice critical">
+        GitLab could not list this repository’s branches ({repo.inventory_error}).
+        {#if row.branchNames.length}The branches below are from the previous run.{:else}Nothing is known about it yet.{/if}
+      </p>
+    {/if}
     {#if repo.empty_repo}<p class="notice">Empty repository: no branch.</p>{/if}
 
     <div class="grid cols-2 top">
@@ -96,7 +101,18 @@
           </span>
         </header>
 
-        {#if b.fetch_error}<p class="notice critical">Fetch error: {b.fetch_error}</p>{/if}
+        {#if b.fetch_error}
+          <p class="notice critical">
+            Fetch error: {b.fetch_error}.
+            {#if b.facts_sha}
+              The links below come from
+              <a class="mono" href={treeUrl(row.webUrl, b.facts_sha)} target="_blank" rel="noreferrer">{shortSha(b.facts_sha)}</a>,
+              the last commit that was read.
+            {:else}
+              Nothing is known about this branch yet.
+            {/if}
+          </p>
+        {/if}
 
         {#if links.length}
           <div class="table-wrap">

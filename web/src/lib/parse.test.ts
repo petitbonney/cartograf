@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { safeUrl } from './model'
 import { parseCartography } from './parse'
 import { href, parseHash } from './router.svelte'
+import { dataPath } from './store.svelte'
 
 describe('parseCartography', () => {
   it('reads YAML with quoted versions and dates as strings', () => {
@@ -28,6 +30,25 @@ describe('parseCartography', () => {
     expect(() => parseCartography('  \n', 'x.yaml')).toThrow(/empty/)
     expect(() => parseCartography('a: 1\n', 'x.yaml')).toThrow(/no "repos" section/)
     expect(() => parseCartography('a: [\n', 'x.yaml')).toThrow(/could not be parsed/)
+  })
+})
+
+describe('untrusted paths and URLs', () => {
+  it('accepts only same-site relative data paths', () => {
+    expect(dataPath('cartography.yaml')).toBe('cartography.yaml')
+    expect(dataPath('data/c.json')).toBe('data/c.json')
+    expect(dataPath(' ')).toBeNull()
+    expect(dataPath(null)).toBeNull()
+    for (const bad of ['https://evil.test/c.yaml', '//evil.test/c.yaml', '/\\evil.test/c.yaml', 'javascript:alert(1)', 'data:text/plain,x']) {
+      expect(dataPath(bad)).toBeNull()
+    }
+  })
+
+  it('links only to http(s) URLs', () => {
+    expect(safeUrl('https://gitlab.example.com/g/r')).toBe('https://gitlab.example.com/g/r')
+    expect(safeUrl('javascript:alert(1)')).toBeNull()
+    expect(safeUrl('not a url')).toBeNull()
+    expect(safeUrl(42)).toBeNull()
   })
 })
 

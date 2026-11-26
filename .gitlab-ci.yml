@@ -42,7 +42,9 @@ pages:
     - npm run build
     - |
       if [ "$CARTOGRAF_PUBLISH_DATA" = "true" ]; then
-        if [ -f ../cartography.yaml ]; then cp ../cartography.yaml dist/; else echo "CARTOGRAF_PUBLISH_DATA is set but cartography.yaml is missing" >&2; exit 1; fi
+        if [ ! -f ../cartography.yaml ]; then echo "CARTOGRAF_PUBLISH_DATA is set but cartography.yaml is missing" >&2; exit 1; fi
+        cp ../cartography.yaml dist/
+        echo '{ "data": "cartography.yaml" }' > dist/config.json
       fi
     - mv dist ../public
   artifacts:

@@ -186,8 +186,10 @@ def print_summary(state: dict, stats, output: Path) -> None:
         "",
         f"Wrote {output}",
         "Repos: {repos_seen} active ({frameworks} frameworks, {linked} linked, {adhoc} adhoc, "
-        "{non_maven} non-maven), {gone} gone".format(**{k: c.get(k, 0) for k in (
-            "repos_seen", "frameworks", "linked", "adhoc", "non_maven", "gone")}),
+        "{non_maven} non-maven{unknown}), {gone} gone".format(
+            **{k: c.get(k, 0) for k in ("repos_seen", "frameworks", "linked", "adhoc", "non_maven", "gone")},
+            unknown=f", {c['unknown']} unknown" if c.get("unknown") else "",
+        ),
     ]
     if stats is not None:
         lines.append(f"Branches: {stats.branches} selected, {stats.fetched} fetched, "

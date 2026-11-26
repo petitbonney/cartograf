@@ -7,8 +7,13 @@
 
   // Known keys first, in a useful reading order; anything else after.
   const ORDER = ['repo', 'branch', 'framework', 'artifact', 'parent', 'pom', 'link_type', 'declared', 'resolved',
-    'versions', 'available', 'frameworks', 'count', 'poms', 'detail']
-  const LABELS: Record<string, string> = { link_type: 'Link type', poms: 'Poms', available: 'Available versions' }
+    'versions', 'available', 'frameworks', 'count', 'poms', 'facts_sha', 'detail']
+  const LABELS: Record<string, string> = {
+    link_type: 'Link type',
+    poms: 'Poms',
+    available: 'Available versions',
+    facts_sha: 'Facts from commit',
+  }
   const entries = $derived(
     Object.entries(item)
       .filter(([k, v]) => k !== 'type' && v !== null && v !== undefined)

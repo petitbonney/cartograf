@@ -4,17 +4,18 @@
   import SegmentedBar from '../components/SegmentedBar.svelte'
   import StatTile from '../components/StatTile.svelte'
   import { fmtDateTime, fmtNum, hostOf, plural } from '../lib/format'
-  import { HEALTH, HEALTH_ORDER, KIND_INFO, KIND_ORDER, REVIEW_INFO, reviewTitle, type Model } from '../lib/model'
+  import { HEALTH, HEALTH_ORDER, KIND_INFO, KIND_ORDER, REVIEW_INFO, reviewTitle, safeUrl, type Model } from '../lib/model'
   import { href } from '../lib/router.svelte'
 
   let { model }: { model: Model } = $props()
 
   const meta = $derived(model.data.meta)
+  const gitlabUrl = $derived(safeUrl(meta.gitlab_url))
   const run = $derived(meta.last_run)
   const t = $derived(model.totals)
 
   const kindParts = $derived(
-    KIND_ORDER.map((k) => ({
+    KIND_ORDER.filter((k) => k !== 'unknown' || t.byKind[k]).map((k) => ({
       key: k,
       label: KIND_INFO[k].label,
       value: t.byKind[k] ?? 0,
@@ -31,7 +32,7 @@
       <h1>Overview</h1>
       <p>
         Run of {fmtDateTime(meta.generated_at)}
-        {#if meta.gitlab_url}on <a href={meta.gitlab_url} target="_blank" rel="noreferrer">{hostOf(meta.gitlab_url)}</a>{/if}
+        {#if gitlabUrl}on <a href={gitlabUrl} target="_blank" rel="noreferrer">{hostOf(gitlabUrl)}</a>{/if}
         {#if meta.token_user}as <strong>{meta.token_user}</strong>{/if}
         {#if meta.suffix}· frameworks end with <code>{meta.suffix}</code>{/if}
       </p>

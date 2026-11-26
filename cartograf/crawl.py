@@ -129,6 +129,14 @@ def fetch_branch(client: GitLabClient, project_id: int, sha: str, exclude_paths:
     return {"maven": True, "poms": poms}
 
 
+_FACT_KEYS = ("sha", "committed_at", "default", "maven", "poms", "facts_sha", "fetch_error")
+
+
+def _facts_only(branch: dict) -> dict:
+    """A stored branch without the fields the analysis derives (kind, framework_links)."""
+    return {k: branch[k] for k in _FACT_KEYS if k in branch}
+
+
 def inventory(client: GitLabClient, groups: list[str]) -> tuple[dict[int, dict], list[str]]:
     projects: dict[int, dict] = {}
     missing: list[str] = []
@@ -225,14 +233,17 @@ def crawl(
         elif old.get("latest_tag"):
             entry["latest_tag"] = old["latest_tag"]
         blist, err = branch_lists.get(pid, ([], None))
+        old_branches = old.get("branches") or {}
         if err:
+            # Branches unknown this run: keep last run's branches and facts rather than
+            # losing the repo's framework links over one failed API call.
             entry["inventory_error"] = err
+            entry["branches"] = {name: _facts_only(b) for name, b in sorted(old_branches.items())}
         if not blist and not err:
             entry["empty_repo"] = True
         selected = select_branches(
             blist, p.get("default_branch"), cfg.branch_window_days, cfg.exclude_branches, now
         )
-        old_branches = old.get("branches") or {}
         for b in selected:
             stats.branches += 1
             prev = old_branches.get(b["name"])
@@ -291,6 +302,13 @@ def crawl(
                 target["fetch_error"] = err
                 stats.errors += 1
                 log.warning("%s@%s: %s", path, b["name"], err)
+                # Keep the facts of the last commit that was read, if any, so the repo
+                # keeps its framework links until the next run retries the fetch.
+                prev = ((old_by_id.get(p["id"]) or {}).get("branches") or {}).get(b["name"])
+                if prev and "maven" in prev:
+                    target["maven"] = prev["maven"]
+                    target["poms"] = prev.get("poms") or []
+                    target["facts_sha"] = prev.get("facts_sha") or prev.get("sha")
             else:
                 target.update(result)
                 stats.fetched += 1

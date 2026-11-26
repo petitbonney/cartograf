@@ -3,7 +3,7 @@
 Maps Maven framework usage across GitLab repositories.
 
 - A **framework** is a repository whose name ends with a given suffix (e.g. `-framework`).
-- Every other repo in the given groups is classified as **linked** (uses at least one framework, with the version it uses), **adhoc** (Maven, no framework), **non-maven**, or **gone** (no longer visible).
+- Every other repo in the given groups is classified as **linked** (uses at least one framework, with the version it uses), **adhoc** (Maven, no framework), **non-maven**, **unknown** (the GitLab API failed and nothing was read yet), or **gone** (no longer visible).
 - Links are found by Maven coordinates (`groupId:artifactId`) published by the framework repos: `parent`, `bom` (import), `dependency`, `plugin`, and `inherited` (through an intermediate parent pom from another repo, e.g. a corporate parent).
 - Static `pom.xml` parsing only, read through the GitLab API. Nothing is cloned or executed, and Maven is not run.
 - The output is a single YAML file that also serves as incremental state. On later runs only branches whose head SHA changed are re-fetched.
@@ -99,6 +99,7 @@ repos:       # per repo (keyed by path, matched across runs by project_id)
       main:
         sha, committed_at, default, maven
         poms: [...]             # parsed pom facts (what the analysis runs on)
+        fetch_error, facts_sha  # only after a failed fetch: poms are those of commit facts_sha
         framework_links:
           - framework, artifact, type, pom, declared, resolved, status,
             framework_latest, behind, managed_by | via + inherited_type | reason
@@ -108,6 +109,7 @@ review:      # items that need a human look
 - `status`: `resolved` (explicit version), `managed` (no version, taken from dependencyManagement/pluginManagement of the parent chain or an imported BOM), `unresolved` (`resolved: null` plus a `reason`), `range`, `snapshot`.
 - `framework_latest`: the framework's latest release tag if it has one, else its default-branch pom version. `behind` is only set when the two versions are comparable.
 - Branches: the default branch, plus the most recently committed other branch inside the window. Each is analyzed separately.
+- API failures don't erase what is known. If a branch's new commit can't be read, its previous facts are kept and `facts_sha` names the commit they come from. If the branches can't be listed, the previous run's branches are kept and the repo gets `inventory_error`. With no earlier facts, the branch and repo are `unknown`. Both are retried on the next run.
 
 ### Review types
 
@@ -118,14 +120,15 @@ review:      # items that need a human look
 | `unresolved_version` / `range_version` / `snapshot_version` | per framework link |
 | `branch_disagreement` | default branch and recent branch use different framework versions |
 | `weak_signal` | the suffix appears in coordinates or `<url>`/`<scm>` that do not match a known framework (a framework outside the crawl, or naming drift) |
-| `pom_error`, `fetch_error` | unparsable/empty pom, or API failure (retried on the next run) |
+| `pom_error` | unparsable or empty pom |
+| `fetch_error`, `inventory_error` | API failure reading a branch, or listing a repo's branches. Earlier facts are kept (`facts_sha` names their commit), and both are retried on the next run |
 | `artifact_collision`, `framework_without_pom` | the same artifact is published by two frameworks, or a framework repo has no pom |
 
 ## 4. View the results in a browser
 
 [web/](web/) is a static web UI for the output file: overview, frameworks and the versions in use, a repo × framework matrix, per-repo details with links to GitLab, and the review queue. It is plain files after the build, so it can be hosted on GitHub Pages or GitLab Pages. See [web/README.md](web/README.md).
 
-The page opens a `cartography.yaml`/`.json` you choose or drop on it. The file is read in the browser and not uploaded. It also loads `cartography.yaml` automatically when the file sits next to `index.html`. Only publish it that way on an access-controlled site: it names internal repositories, the GitLab URL and the token's user.
+The page opens a `cartography.yaml`/`.json` you choose or drop on it. The file is read in the browser and not uploaded. It can also open a file published with the site, named in `config.json`. Only publish it that way on an access-controlled site: it names internal repositories, the GitLab URL and the token's user.
 
 ## 5. Limitations (by design)
 

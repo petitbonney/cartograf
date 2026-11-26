@@ -129,10 +129,84 @@ def test_fetch_error_is_recorded_and_retried(fake_gitlab):
     assert stats.errors == 1
     assert "fetch_error" in state["repos"]["grp/svc"]["branches"]["main"]
     assert any(r["type"] == "fetch_error" for r in state["review"])
+    # Nothing is known about the repo yet: unknown, not non-maven.
+    assert state["repos"]["grp/svc"]["branches"]["main"]["kind"] == "unknown"
+    assert state["repos"]["grp/svc"]["kind"] == "unknown"
+    assert state["meta"]["counts"]["unknown"] == 1
     fake_gitlab.tree = orig
     state2, stats2 = run(fake_gitlab, state)
     assert stats2.fetched == 1
     assert "fetch_error" not in state2["repos"]["grp/svc"]["branches"]["main"]
+
+
+def test_fetch_error_keeps_previous_facts(fake_gitlab):
+    from cartograf.gitlab_client import GitLabError
+    seed(fake_gitlab)
+    state, _ = run(fake_gitlab, {})
+    old_poms = state["repos"]["grp/svc"]["branches"]["main"]["poms"]
+
+    # New commit, and its fetch fails: the facts of the previous commit are kept.
+    fake_gitlab.set_branches(2, {"main": ("s2", RECENT, {"pom.xml": pom("svc", g="s", v="2")})})
+    orig = fake_gitlab.tree
+
+    def broken(pid, ref):
+        if pid == 2:
+            raise GitLabError("HTTP 500", 500)
+        return orig(pid, ref)
+
+    fake_gitlab.tree = broken
+    state2, stats2 = run(fake_gitlab, state)
+    b = state2["repos"]["grp/svc"]["branches"]["main"]
+    assert stats2.errors == 1
+    assert b["sha"] == "s2" and b["facts_sha"] == "s1" and "fetch_error" in b
+    assert b["maven"] is True and b["poms"] == old_poms
+    assert state2["repos"]["grp/svc"]["kind"] == "linked"
+    assert "grp/svc" in state2["frameworks"]["grp/acme-framework"]["used_by"]
+    [err] = [r for r in state2["review"] if r["type"] == "fetch_error"]
+    assert err["repo"] == "grp/svc" and err["facts_sha"] == "s1"
+
+    # Still failing: still the facts of the last commit that was read.
+    state3, _ = run(fake_gitlab, state2)
+    assert state3["repos"]["grp/svc"]["branches"]["main"]["facts_sha"] == "s1"
+
+    # Fixed: fresh facts, no leftover markers.
+    fake_gitlab.tree = orig
+    state4, stats4 = run(fake_gitlab, state3)
+    b4 = state4["repos"]["grp/svc"]["branches"]["main"]
+    assert stats4.fetched == 1
+    assert "fetch_error" not in b4 and "facts_sha" not in b4
+    assert state4["repos"]["grp/svc"]["kind"] == "adhoc"  # the new pom has no framework parent
+
+
+def test_branch_listing_error_keeps_previous_branches(fake_gitlab):
+    from cartograf.gitlab_client import GitLabError
+    seed(fake_gitlab)
+    state, _ = run(fake_gitlab, {})
+    orig = fake_gitlab.branches
+
+    def broken(pid):
+        if pid == 2:
+            raise GitLabError("HTTP 502", 502)
+        return orig(pid)
+
+    fake_gitlab.branches = broken
+    state2, stats2 = run(fake_gitlab, state)
+    svc = state2["repos"]["grp/svc"]
+    assert "cannot list branches" in svc["inventory_error"]
+    assert svc["branches"]["main"]["poms"] == state["repos"]["grp/svc"]["branches"]["main"]["poms"]
+    assert svc["kind"] == "linked"
+    assert stats2.branches == 2  # kept branches are not counted as selected
+    assert [r["repo"] for r in state2["review"] if r["type"] == "inventory_error"] == ["grp/svc"]
+
+    # Nothing to fall back on: unknown.
+    state3, _ = run(fake_gitlab, {})
+    assert state3["repos"]["grp/svc"]["kind"] == "unknown"
+    assert state3["repos"]["grp/svc"]["branches"] == {}
+
+    fake_gitlab.branches = orig
+    state4, _ = run(fake_gitlab, state2)
+    assert "inventory_error" not in state4["repos"]["grp/svc"]
+    assert state4["repos"]["grp/svc"]["kind"] == "linked"
 
 
 def test_missing_group_listed(fake_gitlab):

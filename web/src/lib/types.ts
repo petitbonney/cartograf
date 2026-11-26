@@ -44,6 +44,8 @@ export interface Branch {
   poms?: PomFacts[]
   framework_links?: FrameworkLink[]
   fetch_error?: string
+  /** set when the fetch failed: the facts come from this older commit */
+  facts_sha?: string
 }
 
 export interface Repo {

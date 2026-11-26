@@ -1,9 +1,24 @@
 import { buildModel, type Model } from './model'
 import { parseCartography } from './parse'
 
-/** Where the page looks for published data, next to index.html. */
-export const PUBLISHED_FILES = ['cartography.yaml', 'cartography.json']
+/**
+ * config.json ships with every build and says which data file, if any, the page
+ * opens on load: `{"data": "cartography.yaml"}`. The default is `{"data": null}`,
+ * so a site without published data makes no request that can 404.
+ */
+export const CONFIG_FILE = 'config.json'
 export const SAMPLE_FILE = 'sample.yaml'
+
+/**
+ * Only same-site relative paths are accepted (from config.json or `?data=`):
+ * a link must not make the page load a file from somewhere else.
+ */
+export function dataPath(value: unknown): string | null {
+  if (typeof value !== 'string' || !value.trim()) return null
+  const v = value.trim()
+  if (/^[a-z][a-z0-9+.-]*:/i.test(v) || v.startsWith('//') || v.includes('\\')) return null
+  return v
+}
 
 class DataStore {
   // $state.raw: the parsed file can be large; it is replaced wholesale, never mutated.
@@ -43,30 +58,26 @@ class DataStore {
     }
   }
 
-  /** Try the published files quietly. Missing files are expected, not an error. */
+  /** Open the data file named by `?data=` or by config.json, if any. */
   async autoload() {
+    const fromQuery = new URLSearchParams(window.location.search).get('data')
+    if (fromQuery !== null) {
+      const path = dataPath(fromQuery)
+      if (path) return this.loadUrl(path, path.split('/').pop())
+      this.error = '?data= must be a relative path on this site'
+      return
+    }
     this.loading = true
+    let path: string | null = null
     try {
-      for (const f of PUBLISHED_FILES) {
-        let text: string
-        try {
-          const res = await fetch(`./${f}`, { cache: 'no-cache' })
-          if (!res.ok) continue
-          text = await res.text()
-        } catch {
-          continue // network error: try the next one
-        }
-        if (text.trimStart().startsWith('<')) continue // a dev server's SPA fallback page
-        try {
-          this.use(text, f, f)
-        } catch (err) {
-          this.error = (err as Error).message // the file is there but broken: say so
-        }
-        return
-      }
+      const res = await fetch(`./${CONFIG_FILE}`, { cache: 'no-cache' })
+      if (res.ok) path = dataPath(((await res.json()) as { data?: unknown }).data)
+    } catch {
+      // no usable config.json (or a dev server's HTML fallback): nothing to open
     } finally {
       this.loading = false
     }
+    if (path) await this.loadUrl(path, path.split('/').pop())
   }
 
   close() {

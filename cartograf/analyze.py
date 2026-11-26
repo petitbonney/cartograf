@@ -119,18 +119,28 @@ def analyze(state: dict) -> dict:
         is_fw = path in fw_paths
         any_maven = False
         any_link = False
+        any_unknown = False
+        if r.get("inventory_error"):
+            review.append({"type": "inventory_error", "repo": path, "detail": r["inventory_error"]})
         uses: dict[str, dict[str, list[str]]] = defaultdict(dict)
 
         for bname, b in sorted((r.get("branches") or {}).items()):
             if b.get("fetch_error"):
-                review.append({"type": "fetch_error", "repo": path, "branch": bname,
-                               "detail": b["fetch_error"]})
+                item = {"type": "fetch_error", "repo": path, "branch": bname, "detail": b["fetch_error"]}
+                if b.get("facts_sha"):
+                    item["facts_sha"] = b["facts_sha"]  # analysis uses the facts of this older commit
+                review.append(item)
             poms = b.get("poms") or []
             for p in poms:
                 if "error" in p:
                     review.append({"type": "pom_error", "repo": path, "branch": bname,
                                    "pom": p["path"], "detail": p["error"]})
-            if not b.get("maven"):
+            if "maven" not in b:  # never read: the fetch failed and there are no earlier facts
+                b["kind"] = "unknown"
+                b.pop("framework_links", None)
+                any_unknown = True
+                continue
+            if not b["maven"]:
                 b["kind"] = "non-maven"
                 b.pop("framework_links", None)
                 continue
@@ -190,6 +200,9 @@ def analyze(state: dict) -> dict:
         elif any_maven:
             r["kind"] = "adhoc"
             counts["adhoc"] += 1
+        elif any_unknown or (r.get("inventory_error") and not r.get("branches")):
+            r["kind"] = "unknown"
+            counts["unknown"] += 1
         else:
             r["kind"] = "non-maven"
             counts["non_maven"] += 1
@@ -220,7 +233,7 @@ def analyze(state: dict) -> dict:
         review_counts[item["type"]] += 1
     meta["counts"] = {
         k: counts[k]
-        for k in ("repos_seen", "maven", "non_maven", "frameworks", "linked", "adhoc", "gone")
+        for k in ("repos_seen", "maven", "non_maven", "unknown", "frameworks", "linked", "adhoc", "gone")
     }
     meta["review_counts"] = dict(sorted(review_counts.items()))
     return state

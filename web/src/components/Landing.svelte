@@ -35,9 +35,9 @@
   <details>
     <summary>Publishing your data with this page</summary>
     <p>
-      Put <code>cartography.yaml</code> (or <code>cartography.json</code>) next to <code>index.html</code> and the page
-      opens it on load. Only do this where the site is access-controlled: the file names internal repositories, the
-      GitLab URL and the token’s user.
+      Put <code>cartography.yaml</code> next to <code>index.html</code> and set <code>config.json</code> to
+      <code>{'{"data": "cartography.yaml"}'}</code>: the page then opens it on load. Only do this where the site is
+      access-controlled: the file names internal repositories, the GitLab URL and the token’s user.
     </p>
   </details>
 </div>

@@ -133,13 +133,14 @@ export interface Model {
   }
 }
 
-export const KIND_ORDER = ['framework', 'linked', 'adhoc', 'non-maven', 'gone'] as const
+export const KIND_ORDER = ['framework', 'linked', 'adhoc', 'non-maven', 'unknown', 'gone'] as const
 
 export const KIND_INFO: Record<string, { label: string; hint: string }> = {
   framework: { label: 'Framework', hint: 'repo name ends with the framework suffix' },
   linked: { label: 'Linked', hint: 'Maven repo that uses at least one framework' },
   adhoc: { label: 'Ad hoc', hint: 'Maven repo that uses no framework' },
   'non-maven': { label: 'Non-Maven', hint: 'no pom.xml on the selected branches' },
+  unknown: { label: 'Unknown', hint: 'could not be read yet: the GitLab API failed and there are no earlier facts' },
   gone: { label: 'Gone', hint: 'no longer visible to the token' },
 }
 
@@ -224,7 +225,15 @@ export const REVIEW_INFO: Record<string, { title: string; description: string }>
     description:
       'The parent is crawled, but not at that version (typically an older framework version). Versions managed by it stay unresolved.',
   },
-  fetch_error: { title: 'Fetch error', description: 'GitLab API failure. Retried on the next run.' },
+  inventory_error: {
+    title: 'Branch listing error',
+    description: 'GitLab could not list the branches. The branches and facts of the previous run are kept. Retried on the next run.',
+  },
+  fetch_error: {
+    title: 'Fetch error',
+    description:
+      'GitLab API failure while reading a branch. The facts of the last commit that was read, if any, are kept. Retried on the next run.',
+  },
   pom_error: { title: 'Pom error', description: 'Unparsable or empty pom.xml.' },
   unresolved_version: { title: 'Unresolved version', description: 'A framework link whose version could not be determined.' },
   range_version: { title: 'Version range', description: 'A framework link declared with a version range.' },
@@ -272,9 +281,24 @@ export function reviewRepos(item: ReviewItem): string[] {
 
 // -- GitLab links -----------------------------------------------------------------
 
+/**
+ * The URL itself if it is http(s), else null. Links are built from file contents,
+ * and a crafted file must not be able to inject a `javascript:` link.
+ */
+export function safeUrl(url: unknown): string | null {
+  if (typeof url !== 'string') return null
+  try {
+    const u = new URL(url)
+    return u.protocol === 'https:' || u.protocol === 'http:' ? url : null
+  } catch {
+    return null
+  }
+}
+
 export function repoWebUrl(data: Cartography, path: string, repo?: Repo): string | null {
-  if (repo?.web_url) return repo.web_url
-  const base = data.meta.gitlab_url
+  const own = safeUrl(repo?.web_url)
+  if (own) return own
+  const base = safeUrl(data.meta.gitlab_url)
   return base ? `${base.replace(/\/$/, '')}/${displayPath(path)}` : null
 }
 

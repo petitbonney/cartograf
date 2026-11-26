@@ -62,6 +62,16 @@ describe('buildModel on the sample', () => {
     expect(model.totals.gone).toBe(c.gone)
     expect(model.totals.byKind.linked).toBe(c.linked)
     expect(model.totals.byKind.framework).toBe(c.frameworks)
+    expect(model.totals.byKind.unknown).toBe(c.unknown)
+  })
+
+  it('keeps the links of a repo whose last fetch failed, and marks unread repos unknown', () => {
+    const media = model.repoByPath.get('web/media-service')!
+    expect(media.kind).toBe('linked')
+    expect(media.repo.branches!.main.facts_sha).toBeTruthy()
+    expect(media.cells.map((c) => c.framework)).toEqual(['platform/acme-framework'])
+    expect(model.repoByPath.get('web/analytics-proxy')!.kind).toBe('unknown')
+    expect(model.repoByPath.get('data/warehouse-sync')!.review.map((r) => r.type)).toEqual(['inventory_error'])
   })
 
   it('keeps versions and dates as strings', () => {
