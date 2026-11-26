@@ -121,17 +121,25 @@ review:      # items that need a human look
 | `pom_error`, `fetch_error` | unparsable/empty pom, or API failure (retried on the next run) |
 | `artifact_collision`, `framework_without_pom` | the same artifact is published by two frameworks, or a framework repo has no pom |
 
-## 4. Limitations (by design)
+## 4. View the results in a browser
+
+[web/](web/) is a static web UI for the output file: overview, frameworks and the versions in use, a repo × framework matrix, per-repo details with links to GitLab, and the review queue. It is plain files after the build, so it can be hosted on GitHub Pages or GitLab Pages. See [web/README.md](web/README.md).
+
+The page opens a `cartography.yaml`/`.json` you choose or drop on it. The file is read in the browser and not uploaded. It also loads `cartography.yaml` automatically when the file sits next to `index.html`. Only publish it that way on an access-controlled site: it names internal repositories, the GitLab URL and the token's user.
+
+## 5. Limitations (by design)
 
 - No transitive resolution, no Gradle, and profiles (`<profiles>`) are not read.
 - A parent or BOM from another repo is only used when the exact version is in the crawl (a framework's current branches). Older versions are reported, not guessed.
 - Inherited `${project.version}` follows Maven semantics: it is interpolated in the child's context.
 - Version comparison approximates Maven ordering for `1.2.3[-qualifier]`. Anything else gives `behind` unset.
 
-## 5. Development
+## 6. Development
 
 ```bash
 ./run-in-docker.sh --test -q
 ```
+
+Web UI: see [web/README.md](web/README.md).
 
 Code map: [gitlab_client.py](cartograf/gitlab_client.py) (HTTP, pagination, retry) · [pom_parser.py](cartograf/pom_parser.py) · [resolver.py](cartograf/resolver.py) (parent chain, properties, management, versions) · [analyze.py](cartograf/analyze.py) (links, classification, review) · [crawl.py](cartograf/crawl.py) (inventory, branch selection, incremental fetch) · [store.py](cartograf/store.py) (deterministic YAML/JSON, always-quoted versions) · [cli.py](cartograf/cli.py).

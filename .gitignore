@@ -5,3 +5,10 @@ __pycache__/
 # Site-specific CA certificates (see certs/README.md)
 certs/*
 !certs/README.md
+# Web UI
+web/node_modules/
+web/dist/
+web/.npm/
+# A real output dropped into web/public for local testing must not be committed or deployed
+web/public/cartography.yaml
+web/public/cartography.json

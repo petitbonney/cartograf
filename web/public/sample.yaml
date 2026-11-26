@@ -1,0 +1,1440 @@
+frameworks:
+  data/etl-framework:
+    artifacts:
+    - "com.acme.data:etl-core"
+    branches:
+      main:
+        sha: e0a4f21
+        version: "0.9.3"
+    latest: "0.9.3"
+    latest_tag: null
+    project_id: 1004
+    status: active
+    used_by:
+    - data/ingest
+    - data/reporting
+    - data/warehouse-sync
+    version_default_branch: "0.9.3"
+  platform/acme-framework:
+    artifacts:
+    - "com.acme.platform:acme-bom"
+    - "com.acme.platform:acme-core"
+    - "com.acme.platform:acme-parent"
+    - "com.acme.platform:acme-web"
+    branches:
+      develop:
+        sha: a7d02b4
+        version: "3.6.0-SNAPSHOT"
+      main:
+        sha: a1f3c9e
+        version: "3.5.0"
+    latest: "3.5.0"
+    latest_tag: "3.5.0"
+    project_id: 1001
+    status: active
+    used_by:
+    - payments/fraud-scoring
+    - payments/invoicing
+    - payments/ledger
+    - payments/notifications
+    - payments/payment-api
+    - payments/refunds
+    - platform/corp-parent
+    - platform/messaging-framework
+    - web/checkout
+    - web/search
+    - web/storefront
+    version_default_branch: "3.5.0"
+  platform/build-framework:
+    artifacts:
+    - "com.acme.build:acme-maven-plugin"
+    branches:
+      main:
+        sha: b9c1d77
+        version: "1.8.0"
+    latest: "1.8.0"
+    latest_tag: "1.8.0"
+    project_id: 1003
+    status: active
+    used_by:
+    - data/ingest
+    - platform/corp-parent
+    - web/checkout
+    - web/storefront
+    version_default_branch: "1.8.0"
+  platform/messaging-framework:
+    artifacts:
+    - "com.acme.messaging:messaging-starter"
+    branches:
+      main:
+        sha: m42be10
+        version: "2.2.1"
+    latest: "2.2.1"
+    latest_tag: "2.2.1"
+    links_to:
+    - platform/acme-framework
+    project_id: 1002
+    status: active
+    used_by:
+    - payments/notifications
+    - payments/refunds
+    version_default_branch: "2.2.1"
+meta:
+  branch_window_days: 90
+  counts:
+    adhoc: 3
+    frameworks: 4
+    gone: 1
+    linked: 13
+    maven: 20
+    non_maven: 5
+    repos_seen: 25
+  exclude_branches:
+  - "dependabot/*"
+  - "renovate/*"
+  - "renovate-*"
+  exclude_pom_paths:
+  - "src/test/*"
+  - "*/src/test/*"
+  - "src/it/*"
+  - "*/src/it/*"
+  - "target/*"
+  - "*/target/*"
+  - "node_modules/*"
+  - "*/node_modules/*"
+  facts_version: 1
+  generated_at: "2026-11-20T08:30:00+00:00"
+  gitlab_url: "https://gitlab.example.com"
+  groups:
+  - platform
+  - payments
+  - web
+  - data
+  - archive
+  last_run:
+    api_requests: 0
+    branches: 28
+    fetch_errors: 1
+    fetched: 0
+    gone: 1
+    missing_groups:
+    - archive
+    projects: 25
+    reused: 27
+  review_counts:
+    branch_disagreement: 2
+    fetch_error: 1
+    parent_version_not_in_crawl: 2
+    pom_error: 1
+    range_version: 1
+    snapshot_version: 1
+    unresolved_parent: 1
+    unresolved_version: 4
+    weak_signal: 1
+  suffix: "-framework"
+  token_user: demo-reader
+repos:
+  data/broken-pom:
+    branches:
+      main:
+        committed_at: "2026-10-24T09:30:00+01:00"
+        default: true
+        framework_links: []
+        kind: adhoc
+        maven: true
+        poms:
+        - error: "ParseError: no element found: line 1, column 38"
+          path: pom.xml
+        sha: b0k0001
+    default_branch: main
+    kind: adhoc
+    name: broken-pom
+    project_id: 1024
+    status: active
+    web_url: "https://gitlab.example.com/data/broken-pom"
+  data/etl-framework:
+    branches:
+      main:
+        committed_at: "2026-11-17T09:30:00+01:00"
+        default: true
+        framework_links: []
+        kind: framework
+        maven: true
+        poms:
+        - artifactId: etl-core
+          groupId: com.acme.data
+          packaging: jar
+          path: pom.xml
+          version: "0.9.3"
+        sha: e0a4f21
+    default_branch: main
+    kind: framework
+    latest_tag: null
+    name: etl-framework
+    project_id: 1004
+    status: active
+    web_url: "https://gitlab.example.com/data/etl-framework"
+  data/ingest:
+    branches:
+      main:
+        committed_at: "2026-11-16T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.data:etl-core"
+          behind: false
+          declared: "0.9.3"
+          framework: data/etl-framework
+          framework_latest: "0.9.3"
+          pom: pom.xml
+          resolved: "0.9.3"
+          status: resolved
+          type: dependency
+        - artifact: "com.acme.build:acme-maven-plugin"
+          behind: false
+          declared: "1.8.0"
+          framework: platform/build-framework
+          framework_latest: "1.8.0"
+          pom: pom.xml
+          resolved: "1.8.0"
+          status: resolved
+          type: plugin
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: ingest
+          dependencies:
+          - artifactId: etl-core
+            groupId: com.acme.data
+            version: "0.9.3"
+          groupId: com.acme.data
+          packaging: jar
+          path: pom.xml
+          plugins:
+          - artifactId: acme-maven-plugin
+            groupId: com.acme.build
+            version: "1.8.0"
+          version: "1.0.0"
+        sha: i9e0001
+    default_branch: main
+    kind: linked
+    name: ingest
+    project_id: 1020
+    status: active
+    uses:
+      data/etl-framework:
+        main:
+        - "0.9.3"
+      platform/build-framework:
+        main:
+        - "1.8.0"
+    web_url: "https://gitlab.example.com/data/ingest"
+  data/legacy-batch:
+    branches:
+      main:
+        committed_at: "2026-01-24T09:30:00+01:00"
+        default: true
+        framework_links: []
+        kind: adhoc
+        maven: true
+        poms:
+        - artifactId: legacy-batch
+          dependencies:
+          - artifactId: old-framework-utils
+            groupId: com.acme.legacy
+            version: "1.0"
+          - artifactId: commons-lang3
+            groupId: org.apache.commons
+            version: "3.14.0"
+          groupId: com.acme.data
+          packaging: jar
+          path: pom.xml
+          version: "1.0.0"
+        sha: l9b0001
+    default_branch: main
+    kind: adhoc
+    name: legacy-batch
+    project_id: 1023
+    status: active
+    web_url: "https://gitlab.example.com/data/legacy-batch"
+  data/notebooks:
+    branches:
+      main:
+        committed_at: "2026-11-10T09:30:00+01:00"
+        default: true
+        kind: non-maven
+        maven: false
+        poms: []
+        sha: n8b0001
+    default_branch: main
+    kind: non-maven
+    name: notebooks
+    project_id: 1025
+    status: active
+    web_url: "https://gitlab.example.com/data/notebooks"
+  data/reporting:
+    branches:
+      main:
+        committed_at: "2026-11-14T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.data:etl-core"
+          behind: false
+          declared: "1.0.0-SNAPSHOT"
+          framework: data/etl-framework
+          framework_latest: "0.9.3"
+          pom: pom.xml
+          resolved: "1.0.0-SNAPSHOT"
+          status: snapshot
+          type: dependency
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: reporting
+          dependencies:
+          - artifactId: etl-core
+            groupId: com.acme.data
+            version: "1.0.0-SNAPSHOT"
+          groupId: com.acme.data
+          packaging: jar
+          path: pom.xml
+          version: "1.0.0"
+        sha: r9p0001
+    default_branch: main
+    kind: linked
+    name: reporting
+    project_id: 1022
+    status: active
+    uses:
+      data/etl-framework:
+        main:
+        - "1.0.0-SNAPSHOT"
+    web_url: "https://gitlab.example.com/data/reporting"
+  data/warehouse-sync:
+    branches:
+      main:
+        committed_at: "2026-11-01T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.data:etl-core"
+          behind: true
+          declared: "0.9.1"
+          framework: data/etl-framework
+          framework_latest: "0.9.3"
+          pom: pom.xml
+          resolved: "0.9.1"
+          status: resolved
+          type: dependency
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: warehouse-sync
+          dependencies:
+          - artifactId: etl-core
+            groupId: com.acme.data
+            version: "0.9.1"
+          groupId: com.acme.data
+          packaging: jar
+          path: pom.xml
+          version: "1.0.0"
+        sha: w4h0001
+    default_branch: main
+    kind: linked
+    name: warehouse-sync
+    project_id: 1021
+    status: active
+    uses:
+      data/etl-framework:
+        main:
+        - "0.9.1"
+    web_url: "https://gitlab.example.com/data/warehouse-sync"
+  payments/fraud-scoring:
+    branches:
+      main:
+        committed_at: "2026-10-29T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-core"
+          declared: "${acme.version}"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          reason: "undefined properties: acme.version"
+          resolved: null
+          status: unresolved
+          type: dependency
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: fraud-scoring
+          dependencies:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+            version: "${acme.version}"
+          groupId: com.acme.apps
+          packaging: jar
+          path: pom.xml
+          version: "1.0.0"
+        sha: f4a0d01
+    default_branch: main
+    kind: linked
+    name: fraud-scoring
+    project_id: 1012
+    status: active
+    uses:
+      platform/acme-framework:
+        main:
+        - unresolved
+    web_url: "https://gitlab.example.com/payments/fraud-scoring"
+  payments/invoicing:
+    branches:
+      main:
+        committed_at: "2026-11-15T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-core"
+          behind: false
+          declared: "${acme.version}"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          managed_by: "com.acme.platform:acme-parent:3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: managed
+          type: dependency
+        - artifact: "com.acme.platform:acme-parent"
+          behind: false
+          declared: "3.5.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: resolved
+          type: parent
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: invoicing
+          dependencies:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+          groupId: com.acme.apps
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.5.0"
+          path: pom.xml
+          version: "1.0.0"
+        sha: i7v0c01
+    default_branch: main
+    kind: linked
+    name: invoicing
+    project_id: 1009
+    status: active
+    uses:
+      platform/acme-framework:
+        main:
+        - "3.5.0"
+    web_url: "https://gitlab.example.com/payments/invoicing"
+  payments/ledger:
+    branches:
+      main:
+        committed_at: "2026-10-21T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-core"
+          declared: null
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          reason: "no dependencyManagement entry in the crawled parent chain or BOMs; parent chain stops at com.acme.platform:acme-parent:3.4.0 (parent_version_not_in_crawl)"
+          resolved: null
+          status: unresolved
+          type: dependency
+        - artifact: "com.acme.platform:acme-parent"
+          behind: true
+          declared: "3.4.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.4.0"
+          status: resolved
+          type: parent
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: ledger
+          dependencies:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+          groupId: com.acme.apps
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.4.0"
+          path: pom.xml
+          version: "1.0.0"
+        sha: l3d6e01
+    default_branch: main
+    kind: linked
+    name: ledger
+    project_id: 1008
+    status: active
+    uses:
+      platform/acme-framework:
+        main:
+        - "3.4.0"
+        - unresolved
+    web_url: "https://gitlab.example.com/payments/ledger"
+  payments/notifications:
+    branches:
+      develop:
+        committed_at: "2026-11-16T09:30:00+01:00"
+        default: false
+        framework_links:
+        - artifact: "com.acme.platform:acme-parent"
+          behind: false
+          declared: "3.5.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: resolved
+          type: parent
+        - artifact: "com.acme.messaging:messaging-starter"
+          behind: true
+          declared: "2.1.0"
+          framework: platform/messaging-framework
+          framework_latest: "2.2.1"
+          pom: pom.xml
+          resolved: "2.1.0"
+          status: resolved
+          type: dependency
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: notifications
+          dependencies:
+          - artifactId: messaging-starter
+            groupId: com.acme.messaging
+            version: "2.1.0"
+          groupId: com.acme.apps
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.5.0"
+          path: pom.xml
+          version: "1.0.0"
+        sha: n0t1f02
+      main:
+        committed_at: "2026-11-05T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-parent"
+          behind: false
+          declared: "3.5.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: resolved
+          type: parent
+        - artifact: "com.acme.messaging:messaging-starter"
+          behind: false
+          declared: "2.2.1"
+          framework: platform/messaging-framework
+          framework_latest: "2.2.1"
+          pom: pom.xml
+          resolved: "2.2.1"
+          status: resolved
+          type: dependency
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: notifications
+          dependencies:
+          - artifactId: messaging-starter
+            groupId: com.acme.messaging
+            version: "2.2.1"
+          groupId: com.acme.apps
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.5.0"
+          path: pom.xml
+          version: "1.0.0"
+        sha: n0t1f01
+    default_branch: main
+    kind: linked
+    name: notifications
+    project_id: 1011
+    status: active
+    uses:
+      platform/acme-framework:
+        develop:
+        - "3.5.0"
+        main:
+        - "3.5.0"
+      platform/messaging-framework:
+        develop:
+        - "2.1.0"
+        main:
+        - "2.2.1"
+    web_url: "https://gitlab.example.com/payments/notifications"
+  payments/old-gateway:
+    branches:
+      main:
+        committed_at: "2025-10-16T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-parent"
+          behind: true
+          declared: "3.3.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.3.0"
+          status: resolved
+          type: parent
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: old-gateway
+          groupId: com.acme.apps
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.3.0"
+          path: pom.xml
+          version: "1.0.0"
+        sha: o1d0001
+    default_branch: main
+    gone_since: "2026-11-20T08:30:00+00:00"
+    kind: gone
+    name: old-gateway
+    project_id: 1999
+    status: gone
+    web_url: "https://gitlab.example.com/payments/old-gateway"
+  payments/payment-api:
+    branches:
+      feature/sca-v2:
+        committed_at: "2026-11-11T09:30:00+01:00"
+        default: false
+        framework_links:
+        - artifact: "com.acme.platform:acme-core"
+          declared: null
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          reason: "no dependencyManagement entry in the crawled parent chain or BOMs; parent chain stops at com.acme.platform:acme-parent:3.4.0 (parent_version_not_in_crawl)"
+          resolved: null
+          status: unresolved
+          type: dependency
+        - artifact: "com.acme.platform:acme-parent"
+          behind: true
+          declared: "3.4.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.4.0"
+          status: resolved
+          type: parent
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: payment-api
+          dependencies:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+          groupId: com.acme.apps
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.4.0"
+          path: pom.xml
+          version: "1.0.0"
+        sha: p1a0002
+      main:
+        committed_at: "2026-11-18T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-core"
+          behind: false
+          declared: "${acme.version}"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          managed_by: "com.acme.platform:acme-parent:3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: managed
+          type: dependency
+        - artifact: "com.acme.platform:acme-web"
+          behind: false
+          declared: "${acme.version}"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          managed_by: "com.acme.platform:acme-parent:3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: managed
+          type: dependency
+        - artifact: "com.acme.platform:acme-parent"
+          behind: false
+          declared: "3.5.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: resolved
+          type: parent
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: payment-api
+          dependencies:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+          - artifactId: acme-web
+            groupId: com.acme.platform
+          groupId: com.acme.apps
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.5.0"
+          path: pom.xml
+          version: "1.0.0"
+        sha: p1a0001
+    default_branch: main
+    kind: linked
+    name: payment-api
+    project_id: 1007
+    status: active
+    uses:
+      platform/acme-framework:
+        feature/sca-v2:
+        - "3.4.0"
+        - unresolved
+        main:
+        - "3.5.0"
+    web_url: "https://gitlab.example.com/payments/payment-api"
+  payments/refunds:
+    branches:
+      main:
+        committed_at: "2026-11-12T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-bom"
+          behind: false
+          declared: "3.5.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: resolved
+          type: bom
+        - artifact: "com.acme.platform:acme-core"
+          behind: false
+          declared: "${acme.version}"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          managed_by: "com.acme.platform:acme-bom:3.5.0 (bom)"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: managed
+          type: dependency
+        - artifact: "com.acme.messaging:messaging-starter"
+          behind: true
+          declared: "${messaging.version}"
+          framework: platform/messaging-framework
+          framework_latest: "2.2.1"
+          pom: pom.xml
+          resolved: "2.2.0"
+          status: resolved
+          type: dependency
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: refunds
+          dependencies:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+          - artifactId: messaging-starter
+            groupId: com.acme.messaging
+            version: "${messaging.version}"
+          dependencyManagement:
+          - artifactId: acme-bom
+            groupId: com.acme.platform
+            scope: import
+            type: pom
+            version: "3.5.0"
+          groupId: com.acme.apps
+          packaging: jar
+          parent:
+            artifactId: spring-boot-starter-parent
+            groupId: org.springframework.boot
+            version: "3.3.5"
+          path: pom.xml
+          properties:
+            messaging.version: "2.2.0"
+          version: "1.0.0"
+        sha: r3f0d01
+    default_branch: main
+    kind: linked
+    name: refunds
+    project_id: 1010
+    status: active
+    uses:
+      platform/acme-framework:
+        main:
+        - "3.5.0"
+      platform/messaging-framework:
+        main:
+        - "2.2.0"
+    web_url: "https://gitlab.example.com/payments/refunds"
+  platform/acme-framework:
+    branches:
+      develop:
+        committed_at: "2026-11-19T09:30:00+01:00"
+        default: false
+        framework_links: []
+        kind: framework
+        maven: true
+        poms:
+        - artifactId: acme-bom
+          dependencyManagement:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+            version: "${acme.version}"
+          - artifactId: acme-web
+            groupId: com.acme.platform
+            version: "${acme.version}"
+          groupId: com.acme.platform
+          packaging: pom
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.6.0-SNAPSHOT"
+          path: acme-bom/pom.xml
+          version: "3.6.0-SNAPSHOT"
+        - artifactId: acme-core
+          groupId: com.acme.platform
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.6.0-SNAPSHOT"
+          path: acme-core/pom.xml
+          version: "3.6.0-SNAPSHOT"
+        - artifactId: acme-web
+          dependencies:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+          groupId: com.acme.platform
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.6.0-SNAPSHOT"
+          path: acme-web/pom.xml
+          version: "3.6.0-SNAPSHOT"
+        - artifactId: acme-parent
+          dependencyManagement:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+            version: "${acme.version}"
+          - artifactId: acme-web
+            groupId: com.acme.platform
+            version: "${acme.version}"
+          groupId: com.acme.platform
+          modules:
+          - acme-bom
+          - acme-core
+          - acme-web
+          packaging: pom
+          path: pom.xml
+          properties:
+            acme.version: "3.6.0-SNAPSHOT"
+          version: "3.6.0-SNAPSHOT"
+        sha: a7d02b4
+      main:
+        committed_at: "2026-11-14T09:30:00+01:00"
+        default: true
+        framework_links: []
+        kind: framework
+        maven: true
+        poms:
+        - artifactId: acme-bom
+          dependencyManagement:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+            version: "${acme.version}"
+          - artifactId: acme-web
+            groupId: com.acme.platform
+            version: "${acme.version}"
+          groupId: com.acme.platform
+          packaging: pom
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.5.0"
+          path: acme-bom/pom.xml
+          version: "3.5.0"
+        - artifactId: acme-core
+          groupId: com.acme.platform
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.5.0"
+          path: acme-core/pom.xml
+          version: "3.5.0"
+        - artifactId: acme-web
+          dependencies:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+          groupId: com.acme.platform
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.5.0"
+          path: acme-web/pom.xml
+          version: "3.5.0"
+        - artifactId: acme-parent
+          dependencyManagement:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+            version: "${acme.version}"
+          - artifactId: acme-web
+            groupId: com.acme.platform
+            version: "${acme.version}"
+          groupId: com.acme.platform
+          modules:
+          - acme-bom
+          - acme-core
+          - acme-web
+          packaging: pom
+          path: pom.xml
+          properties:
+            acme.version: "3.5.0"
+          version: "3.5.0"
+        sha: a1f3c9e
+    default_branch: main
+    kind: framework
+    latest_tag: "3.5.0"
+    name: acme-framework
+    project_id: 1001
+    status: active
+    web_url: "https://gitlab.example.com/platform/acme-framework"
+  platform/build-framework:
+    branches:
+      main:
+        committed_at: "2026-10-11T09:30:00+01:00"
+        default: true
+        framework_links: []
+        kind: framework
+        maven: true
+        poms:
+        - artifactId: acme-maven-plugin
+          groupId: com.acme.build
+          packaging: maven-plugin
+          path: pom.xml
+          version: "1.8.0"
+        sha: b9c1d77
+    default_branch: main
+    kind: framework
+    latest_tag: "1.8.0"
+    name: build-framework
+    project_id: 1003
+    status: active
+    web_url: "https://gitlab.example.com/platform/build-framework"
+  platform/corp-parent:
+    branches:
+      main:
+        committed_at: "2026-06-23T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-bom"
+          behind: true
+          declared: "3.4.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.4.0"
+          status: resolved
+          type: bom
+        - artifact: "com.acme.build:acme-maven-plugin"
+          behind: true
+          declared: "1.7.0"
+          framework: platform/build-framework
+          framework_latest: "1.8.0"
+          pom: pom.xml
+          resolved: "1.7.0"
+          status: resolved
+          type: plugin
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: corp-parent
+          dependencyManagement:
+          - artifactId: acme-bom
+            groupId: com.acme.platform
+            scope: import
+            type: pom
+            version: "3.4.0"
+          groupId: com.acme
+          packaging: pom
+          path: pom.xml
+          pluginManagement:
+          - artifactId: acme-maven-plugin
+            groupId: com.acme.build
+            version: "1.7.0"
+          version: "12"
+        sha: c12aa00
+    default_branch: main
+    kind: linked
+    name: corp-parent
+    project_id: 1005
+    status: active
+    uses:
+      platform/acme-framework:
+        main:
+        - "3.4.0"
+      platform/build-framework:
+        main:
+        - "1.7.0"
+    web_url: "https://gitlab.example.com/platform/corp-parent"
+  platform/docs-site:
+    branches:
+      main:
+        committed_at: "2026-10-31T09:30:00+01:00"
+        default: true
+        kind: non-maven
+        maven: false
+        poms: []
+        sha: d0c5000
+    default_branch: main
+    kind: non-maven
+    name: docs-site
+    project_id: 1006
+    status: active
+    web_url: "https://gitlab.example.com/platform/docs-site"
+  platform/messaging-framework:
+    branches:
+      main:
+        committed_at: "2026-11-08T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-core"
+          behind: false
+          declared: "${acme.version}"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          managed_by: "com.acme.platform:acme-parent:3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: managed
+          type: dependency
+        - artifact: "com.acme.platform:acme-parent"
+          behind: false
+          declared: "3.5.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.5.0"
+          status: resolved
+          type: parent
+        kind: framework
+        maven: true
+        poms:
+        - artifactId: messaging-starter
+          dependencies:
+          - artifactId: acme-core
+            groupId: com.acme.platform
+          groupId: com.acme.messaging
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.5.0"
+          path: pom.xml
+          version: "2.2.1"
+        sha: m42be10
+    default_branch: main
+    kind: framework
+    latest_tag: "2.2.1"
+    name: messaging-framework
+    project_id: 1002
+    status: active
+    uses:
+      platform/acme-framework:
+        main:
+        - "3.5.0"
+    web_url: "https://gitlab.example.com/platform/messaging-framework"
+  web/checkout:
+    branches:
+      main:
+        committed_at: "2026-11-09T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-web"
+          declared: "[3.0,4.0)"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "[3.0,4.0)"
+          status: range
+          type: dependency
+        - artifact: "com.acme.platform:acme-bom"
+          behind: true
+          declared: "3.4.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          inherited_type: bom
+          pom: pom.xml
+          resolved: "3.4.0"
+          status: resolved
+          type: inherited
+          via: "com.acme:corp-parent:12 (platform/corp-parent@main:pom.xml)"
+        - artifact: "com.acme.build:acme-maven-plugin"
+          behind: true
+          declared: "1.7.0"
+          framework: platform/build-framework
+          framework_latest: "1.8.0"
+          inherited_type: plugin
+          pom: pom.xml
+          resolved: "1.7.0"
+          status: resolved
+          type: inherited
+          via: "com.acme:corp-parent:12 (platform/corp-parent@main:pom.xml)"
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: checkout
+          dependencies:
+          - artifactId: acme-web
+            groupId: com.acme.platform
+            version: "[3.0,4.0)"
+          groupId: com.acme.web
+          packaging: jar
+          parent:
+            artifactId: corp-parent
+            groupId: com.acme
+            version: "12"
+          path: pom.xml
+          version: "1.0.0"
+        sha: c4e0001
+    default_branch: main
+    kind: linked
+    name: checkout
+    project_id: 1014
+    status: active
+    uses:
+      platform/acme-framework:
+        main:
+        - "3.4.0"
+        - "[3.0,4.0)"
+      platform/build-framework:
+        main:
+        - "1.7.0"
+    web_url: "https://gitlab.example.com/web/checkout"
+  web/cms:
+    branches:
+      main:
+        committed_at: "2026-11-17T09:30:00+01:00"
+        default: true
+        kind: non-maven
+        maven: false
+        poms: []
+        sha: c0m5001
+    default_branch: main
+    kind: non-maven
+    name: cms
+    project_id: 1018
+    status: active
+    web_url: "https://gitlab.example.com/web/cms"
+  web/gateway:
+    branches:
+      main:
+        committed_at: "2026-11-06T09:30:00+01:00"
+        default: true
+        framework_links: []
+        kind: adhoc
+        maven: true
+        poms:
+        - artifactId: gateway
+          groupId: com.acme.web
+          packaging: jar
+          parent:
+            artifactId: spring-boot-starter-parent
+            groupId: org.springframework.boot
+            version: "3.3.5"
+          path: pom.xml
+          version: "1.0.0"
+        sha: g4t0001
+    default_branch: main
+    kind: adhoc
+    name: gateway
+    project_id: 1016
+    status: active
+    web_url: "https://gitlab.example.com/web/gateway"
+  web/landing:
+    branches:
+      main:
+        committed_at: "2026-09-11T09:30:00+01:00"
+        default: true
+        kind: non-maven
+        maven: false
+        poms: []
+        sha: l4n0001
+    default_branch: main
+    kind: non-maven
+    name: landing
+    project_id: 1019
+    status: active
+    web_url: "https://gitlab.example.com/web/landing"
+  web/media-service:
+    branches:
+      main:
+        committed_at: "2026-11-18T09:30:00+01:00"
+        default: true
+        fetch_error: "500 Internal Server Error on repository/tree"
+        kind: non-maven
+        sha: m3d0002
+    default_branch: main
+    kind: non-maven
+    name: media-service
+    project_id: 1017
+    status: active
+    web_url: "https://gitlab.example.com/web/media-service"
+  web/search:
+    branches:
+      main:
+        committed_at: "2026-09-21T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-parent"
+          behind: true
+          declared: "3.3.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: pom.xml
+          resolved: "3.3.0"
+          status: resolved
+          type: parent
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: search
+          groupId: com.acme.web
+          packaging: jar
+          parent:
+            artifactId: acme-parent
+            groupId: com.acme.platform
+            version: "3.3.0"
+          path: pom.xml
+          version: "1.0.0"
+        sha: s3a0001
+    default_branch: main
+    kind: linked
+    name: search
+    project_id: 1015
+    status: active
+    uses:
+      platform/acme-framework:
+        main:
+        - "3.3.0"
+    web_url: "https://gitlab.example.com/web/search"
+  web/storefront:
+    branches:
+      main:
+        committed_at: "2026-11-19T09:30:00+01:00"
+        default: true
+        framework_links:
+        - artifact: "com.acme.platform:acme-bom"
+          behind: true
+          declared: "3.4.0"
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          inherited_type: bom
+          pom: pom.xml
+          resolved: "3.4.0"
+          status: resolved
+          type: inherited
+          via: "com.acme:corp-parent:12 (platform/corp-parent@main:pom.xml)"
+        - artifact: "com.acme.platform:acme-web"
+          declared: null
+          framework: platform/acme-framework
+          framework_latest: "3.5.0"
+          pom: storefront-ui/pom.xml
+          reason: "no dependencyManagement entry in the crawled parent chain or BOMs; BOMs not available in the crawl: com.acme.platform:acme-bom:3.4.0"
+          resolved: null
+          status: unresolved
+          type: dependency
+        - artifact: "com.acme.build:acme-maven-plugin"
+          behind: true
+          declared: "1.7.0"
+          framework: platform/build-framework
+          framework_latest: "1.8.0"
+          inherited_type: plugin
+          pom: pom.xml
+          resolved: "1.7.0"
+          status: resolved
+          type: inherited
+          via: "com.acme:corp-parent:12 (platform/corp-parent@main:pom.xml)"
+        kind: linked
+        maven: true
+        poms:
+        - artifactId: storefront
+          groupId: com.acme.web
+          modules:
+          - storefront-ui
+          packaging: pom
+          parent:
+            artifactId: corp-parent
+            groupId: com.acme
+            version: "12"
+          path: pom.xml
+          version: "4.2.0"
+        - artifactId: storefront-ui
+          dependencies:
+          - artifactId: acme-web
+            groupId: com.acme.platform
+          groupId: com.acme.web
+          packaging: jar
+          parent:
+            artifactId: storefront
+            groupId: com.acme.web
+            version: "4.2.0"
+          path: storefront-ui/pom.xml
+          version: "4.2.0"
+        sha: s7f0001
+    default_branch: main
+    kind: linked
+    name: storefront
+    project_id: 1013
+    status: active
+    uses:
+      platform/acme-framework:
+        main:
+        - "3.4.0"
+        - unresolved
+      platform/build-framework:
+        main:
+        - "1.7.0"
+    web_url: "https://gitlab.example.com/web/storefront"
+review:
+- framework: platform/acme-framework
+  repo: payments/payment-api
+  type: branch_disagreement
+  versions:
+    feature/sca-v2:
+    - "3.4.0"
+    - unresolved
+    main:
+    - "3.5.0"
+- framework: platform/messaging-framework
+  repo: payments/notifications
+  type: branch_disagreement
+  versions:
+    develop:
+    - "2.1.0"
+    main:
+    - "2.2.1"
+- branch: main
+  detail: "500 Internal Server Error on repository/tree"
+  repo: web/media-service
+  type: fetch_error
+- available:
+  - "3.5.0"
+  - "3.6.0-SNAPSHOT"
+  count: 1
+  detail: "parent coordinates are in the crawl but not at this version; inherited properties/management from it are not used"
+  parent: "com.acme.platform:acme-parent:3.3.0"
+  poms:
+  - "web/search@main:pom.xml"
+  type: parent_version_not_in_crawl
+- available:
+  - "3.5.0"
+  - "3.6.0-SNAPSHOT"
+  count: 2
+  detail: "parent coordinates are in the crawl but not at this version; inherited properties/management from it are not used"
+  parent: "com.acme.platform:acme-parent:3.4.0"
+  poms:
+  - "payments/ledger@main:pom.xml"
+  - "payments/payment-api@feature/sca-v2:pom.xml"
+  type: parent_version_not_in_crawl
+- branch: main
+  detail: "ParseError: no element found: line 1, column 38"
+  pom: pom.xml
+  repo: data/broken-pom
+  type: pom_error
+- artifact: "com.acme.platform:acme-web"
+  branch: main
+  declared: "[3.0,4.0)"
+  link_type: dependency
+  pom: pom.xml
+  repo: web/checkout
+  resolved: "[3.0,4.0)"
+  type: range_version
+- artifact: "com.acme.data:etl-core"
+  branch: main
+  declared: "1.0.0-SNAPSHOT"
+  link_type: dependency
+  pom: pom.xml
+  repo: data/reporting
+  resolved: "1.0.0-SNAPSHOT"
+  type: snapshot_version
+- count: 2
+  detail: "parent not found in the crawl (external, e.g. Nexus)"
+  parent: "org.springframework.boot:spring-boot-starter-parent"
+  poms:
+  - "payments/refunds@main:pom.xml"
+  - "web/gateway@main:pom.xml"
+  type: unresolved_parent
+  versions:
+  - "3.3.5"
+- artifact: "com.acme.platform:acme-core"
+  branch: feature/sca-v2
+  declared: null
+  detail: "no dependencyManagement entry in the crawled parent chain or BOMs; parent chain stops at com.acme.platform:acme-parent:3.4.0 (parent_version_not_in_crawl)"
+  link_type: dependency
+  pom: pom.xml
+  repo: payments/payment-api
+  type: unresolved_version
+- artifact: "com.acme.platform:acme-core"
+  branch: main
+  declared: "${acme.version}"
+  detail: "undefined properties: acme.version"
+  link_type: dependency
+  pom: pom.xml
+  repo: payments/fraud-scoring
+  type: unresolved_version
+- artifact: "com.acme.platform:acme-core"
+  branch: main
+  declared: null
+  detail: "no dependencyManagement entry in the crawled parent chain or BOMs; parent chain stops at com.acme.platform:acme-parent:3.4.0 (parent_version_not_in_crawl)"
+  link_type: dependency
+  pom: pom.xml
+  repo: payments/ledger
+  type: unresolved_version
+- artifact: "com.acme.platform:acme-web"
+  branch: main
+  declared: null
+  detail: "no dependencyManagement entry in the crawled parent chain or BOMs; BOMs not available in the crawl: com.acme.platform:acme-bom:3.4.0"
+  link_type: dependency
+  pom: storefront-ui/pom.xml
+  repo: web/storefront
+  type: unresolved_version
+- branch: main
+  detail:
+  - "dependency com.acme.legacy:old-framework-utils"
+  pom: pom.xml
+  repo: data/legacy-batch
+  type: weak_signal

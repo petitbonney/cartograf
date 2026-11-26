@@ -1,0 +1,49 @@
+# Builds the web UI (web/) and publishes it with GitLab Pages.
+#
+# By default only the UI and the fictional sample are published; people open
+# their own file in the page. To publish your data with the site, commit
+# cartography.yaml at the repository root and set the CI/CD variable
+# CARTOGRAF_PUBLISH_DATA=true. Do this only where Pages access control is on:
+# the file names internal repositories, the GitLab URL and the token's user.
+#
+# Behind a TLS-intercepting proxy, set NODE_EXTRA_CA_CERTS to a CI/CD *file*
+# variable holding your CA certificate so npm can reach the registry.
+
+stages: [test, deploy]
+
+.web:
+  image: node:24-alpine
+  before_script:
+    - cd web
+    - npm ci --cache .npm --prefer-offline --no-audit --no-fund
+  cache:
+    key:
+      files: [web/package-lock.json]
+    paths: [web/.npm/]
+
+web-test:
+  extends: .web
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes: [web/**/*, .gitlab-ci.yml]
+  script:
+    - npm run check
+    - npm test
+
+pages:
+  extends: .web
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - npm run check
+    - npm test
+    - npm run build
+    - |
+      if [ "$CARTOGRAF_PUBLISH_DATA" = "true" ]; then
+        if [ -f ../cartography.yaml ]; then cp ../cartography.yaml dist/; else echo "CARTOGRAF_PUBLISH_DATA is set but cartography.yaml is missing" >&2; exit 1; fi
+      fi
+    - mv dist ../public
+  artifacts:
+    paths: [public]
