@@ -1,0 +1,8 @@
+.git
+.venv
+**/__pycache__
+.pytest_cache
+cartography.yaml
+cartography.json
+*.md
+!certs/README.md
